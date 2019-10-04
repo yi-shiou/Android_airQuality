@@ -11,7 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,18 +25,23 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView tv_dailyquote;
     private ListView listView;
-    private ArrayList<String> items;
-    private ArrayAdapter<String> adeptet;
 
     //for database
     private MyDBHelper myDBHelper;
     private AirTable airTable;
+
+    private ArrayList<String> items;
+    private BaseAdapter adapter;
 
     private ProgressDialog dialog;
     @Override
@@ -46,17 +51,14 @@ public class MainActivity extends AppCompatActivity {
         setupViews();
 
 
-        // for database
-        airTable = new AirTable(getApplicationContext());
+        //**** for database
+        myDBHelper = new MyDBHelper(getApplicationContext());
 
-        new HttpAsyncTask().execute("http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=1000&format=json");
-
-        // for ListView
         items = new ArrayList<String>();
-//        adeptet = new MyListAdapter(this,);//or  getActivity()
-//        listView.setAdapter(adeptet);
+        adapter = new MyListAdapter(getApplicationContext(),items);
+        listView.setAdapter(adapter);
 
-
+        //--end dor database ****/
         switchOver();
     }
     private void setupViews() {
@@ -64,6 +66,55 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listView);
     }
     //*********** for not MVP ****************
+
+    //--- for air
+    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=1000&format=json";
+    Runnable runnable_air = new Runnable() {
+        @Override
+        public void run() {
+            String output = "";
+            try {
+
+//                Document doc = Jsoup.connect(airPATH).get();
+
+//                String InboxJson = "";
+//                InboxJson = Jsoup.connect(airPATH)
+//                    .timeout(1000000)
+//                    .header("Accept", "text/json")
+//                    .userAgent("Mozilla/5.0 (Windows NT 6.1; rv:40.0) Gecko/20100101 Firefox/40.0")
+//                    .get()
+//                    .body()
+//                    .text();
+                InputStream input = new URL(airPATH).openStream();
+                Reader reader = new InputStreamReader(input, "UTF-8");
+                int data = reader.read();
+                while (data != -1) {
+                    output += (char)data;
+                    data = reader.read();
+                }
+
+
+                if(output != "") {
+//                    output = doc.text();
+//                    output = "done";
+                }else
+                    output = "Did not work!";
+
+            } catch (Exception e) {
+                output += "error";
+            }
+
+            Message message = new Message();
+            message.obj = output;
+            message.what = 1;
+            handler.sendMessage(message);
+
+        }
+    };
+//    private
+
+
+
 
     //--- for daily
     private String path = "https://tw.appledaily.com/index/dailyquote/";
@@ -83,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
             }
             Message message = new Message();
             message.obj = output;
-            message.arg1 = Integer.parseInt("1");
+            message.what = 11;
             handler.sendMessage(message);
 
         }
@@ -94,15 +145,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.arg1 == 1) {
+            if (msg.what == 11) {
                 showDailyQuote((String)msg.obj);
             }else {
-                showAirData((String)msg.obj);
+                showDailyQuote((String)msg.obj);
             }
         }
     };
     private  void showAirData(String s){
-        myDBHelper = new MyDBHelper(getApplicationContext(),"airQuality.db",null,1);
 
     }
     private void showDailyQuote(String s){
@@ -119,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
             dialog.setCancelable(false);
             dialog.show();
 
-            new Thread(runnable).start();
+//            new Thread(runnable).start();
+            new Thread(runnable_air).start();
 
         } else {
             // 弹出提示框

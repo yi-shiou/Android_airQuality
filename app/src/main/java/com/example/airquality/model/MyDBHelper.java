@@ -21,7 +21,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
 
     public MyDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
-        database = getDatabase(context);
+//        database = getDatabase(context);
         airTable = new AirTable(TABLE_NAME,database);
     }
 
