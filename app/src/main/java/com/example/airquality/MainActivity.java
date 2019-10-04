@@ -11,18 +11,32 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.airquality.model.AirTable;
+import com.example.airquality.model.HttpAsyncTask;
+import com.example.airquality.model.MyDBHelper;
+import com.example.airquality.model.MyListAdapter;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView tv_dailyquote;
+    private ListView listView;
+    private ArrayList<String> items;
+    private ArrayAdapter<String> adeptet;
+
+    //for database
+    private MyDBHelper myDBHelper;
+    private AirTable airTable;
 
     private ProgressDialog dialog;
     @Override
@@ -31,16 +45,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupViews();
 
+
+        // for database
+        airTable = new AirTable(getApplicationContext());
+
+        new HttpAsyncTask().execute("http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=1000&format=json");
+
+        // for ListView
+        items = new ArrayList<String>();
+//        adeptet = new MyListAdapter(this,);//or  getActivity()
+//        listView.setAdapter(adeptet);
+
+
         switchOver();
     }
     private void setupViews() {
         tv_dailyquote = (TextView) findViewById(R.id.tv_dailyquote);
+        listView = (ListView) findViewById(R.id.listView);
     }
     //*********** for not MVP ****************
 
+    //--- for daily
     private String path = "https://tw.appledaily.com/index/dailyquote/";
-//    private String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36";
-
 
     Runnable runnable = new Runnable() {
         @Override
@@ -68,10 +94,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            show((String)msg.obj);
+            if (msg.arg1 == 1) {
+                showDailyQuote((String)msg.obj);
+            }else {
+                showAirData((String)msg.obj);
+            }
         }
     };
-    private void show(String s){
+    private  void showAirData(String s){
+        myDBHelper = new MyDBHelper(getApplicationContext(),"airQuality.db",null,1);
+
+    }
+    private void showDailyQuote(String s){
 
         tv_dailyquote.setText(s);
         dialog.dismiss();
@@ -85,8 +119,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.setCancelable(false);
             dialog.show();
 
-//            list.clear();
-            new Thread(runnable).start();  // 子线程
+            new Thread(runnable).start();
 
         } else {
             // 弹出提示框
