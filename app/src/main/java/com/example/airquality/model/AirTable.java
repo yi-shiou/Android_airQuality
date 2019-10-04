@@ -2,6 +2,7 @@ package com.example.airquality.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import org.json.JSONArray;
@@ -12,19 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AirTable {
-    public static final String TABLE_NAME = "item";
+    public static String TABLE_NAME = "item";
     public static final String KEY_ID = "_id";
 
     public static final String COLUMN_NAMES[] = {"SiteName", "County", "AQI", "Pollutant", "Status", "SO2", "CO", "CO_8hr", "O3", "O3_8hr", "PM10", "PM2.5", "NO2", "NOx", "NO", "WindSpeed", "WindDirec", "PublishTime", "PM2.5_AVG", "PM10_AVG", "SO2_AVG", "Longitude", "Latitude", "SiteId"};
-
+    public static int COLUMN_NUM = 0;
     public static String CREATE_TABLE;
 
 
     private SQLiteDatabase db;
 
-    public AirTable(Context context){
-        db = MyDBHelper.getDatabase(context);
+    public AirTable(String TABLE_NAME,SQLiteDatabase db){
+        this.db = db;
 
+        COLUMN_NUM = COLUMN_NAMES.length;
         CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT";
         for (String s: COLUMN_NAMES) {
@@ -32,9 +34,15 @@ public class AirTable {
         }
         CREATE_TABLE += ")";
     }
-    public void close() {
-        db.close();
+
+    public String printData(Cursor cursor){
+        String output = "";
+        for (int i = 0; i < COLUMN_NUM; i++) {
+            output += "  " + cursor.getString(i);
+        }
+        return output;
     }
+
 
     public void addByJSON(String json){
         try {
@@ -53,7 +61,6 @@ public class AirTable {
         }
 
     }
-
     public void addData(List<String> ls){
         ContentValues cv = new ContentValues();
         for (int i = 0; i < ls.size(); ++i){
