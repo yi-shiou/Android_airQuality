@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -148,12 +151,32 @@ public class MainActivity extends AppCompatActivity {
             if (msg.what == 11) {
                 showDailyQuote((String)msg.obj);
             }else {
-                showDailyQuote((String)msg.obj);
+                showAirData((String)msg.obj);
             }
         }
     };
     private  void showAirData(String s){
+/*
+        String tmp = "1";
+        SQLiteDatabase db = myDBHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("_TITLE", "title");
+        values.put("_CONTENT", "content");
+        values.put("_KIND", "kind");
+        db.insert("MySample", null, values);
 
+        Cursor cursor = db.rawQuery(
+        "SELECT * FROM MySample", null);
+        while (cursor.moveToNext()){
+            tmp += cursor.getString(cursor.getColumnIndex("_TITLE"));
+        }
+*/
+        myDBHelper.addByJSON(s);
+        String tmp;
+        tmp = myDBHelper.queryAll().get(0);
+
+        showDailyQuote(tmp);
+        dialog.dismiss();
     }
     private void showDailyQuote(String s){
 

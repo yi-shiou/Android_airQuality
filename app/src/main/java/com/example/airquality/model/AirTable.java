@@ -21,10 +21,10 @@ public class AirTable {
     public static String CREATE_TABLE;
 
 
-    private SQLiteDatabase db;
+//    private SQLiteDatabase db;
 
     public AirTable(String TABLE_NAME,SQLiteDatabase db){
-        this.db = db;
+//        this.db = db;
 
         COLUMN_NUM = COLUMN_NAMES.length;
         CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
@@ -38,15 +38,16 @@ public class AirTable {
     public String printData(Cursor cursor){
         String output = "";
         for (int i = 0; i < COLUMN_NUM; i++) {
-            output += "  " + cursor.getString(i);
+            output += "  " + cursor.getString(cursor.getColumnIndex(COLUMN_NAMES[i]));
         }
         return output;
     }
 
 
-    public void addByJSON(String json){
+    public void addByJSON(String json,SQLiteDatabase db){
         try {
             JSONArray jsonArray = new JSONArray(json);
+
             for (int i = 0; i < jsonArray.length(); ++i){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -54,14 +55,13 @@ public class AirTable {
                 for (String col_name : COLUMN_NAMES){
                     ls.add(jsonObject.getString(col_name));
                 }
-                addData(ls);
+                addData(ls,db);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
         }
 
     }
-    public void addData(List<String> ls){
+    public void addData(List<String> ls,SQLiteDatabase db){
         ContentValues cv = new ContentValues();
         for (int i = 0; i < ls.size(); ++i){
             cv.put(COLUMN_NAMES[i], ls.get(i));
@@ -69,7 +69,7 @@ public class AirTable {
         db.insert(TABLE_NAME, null, cv);
     }
 
-    public boolean delete(int id){
+    public boolean delete(int id,SQLiteDatabase db){
         String where = KEY_ID + "=" + id;
         return db.delete(TABLE_NAME,where,null) > 0 ;
     }
