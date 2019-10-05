@@ -15,17 +15,17 @@ public class MyDBHelper extends SQLiteOpenHelper {
     public static final int VERSION = 1;
 
     private static MyDBHelper myDBHelper = null;
-    private AirTable airTable = null;
+    public AirTable airTable = null;
     private Context context;
 
-    private static SQLiteDatabase database = null;
+//    private static SQLiteDatabase database = null;
 
     public MyDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
 
-        airTable = new AirTable(TABLE_NAME,database);
+        airTable = new AirTable(TABLE_NAME);
         this.context = context;
-        database = this.getWritableDatabase();
+        this.getWritableDatabase().close();
     }
 
 //    public static SQLiteDatabase getDatabase(Context context) {
@@ -45,6 +45,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
 //				               "_KIND VARCHAR(10)" +
 //				           ");";
 //        db.execSQL(SQL);
+
     }
 
     @Override
@@ -53,9 +54,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void close(){
-        database.close();
-    }
+//    public void close(){
+//        database.close();
+//    }
     public void addByJSON(String json){
         airTable.addByJSON(json,getWritableDatabase());
     }
@@ -75,14 +76,16 @@ public class MyDBHelper extends SQLiteOpenHelper {
     }
     public List<String> queryAll(){
         List<String> ls = new ArrayList<String>();
-        ls.add("hi");
         SQLiteDatabase db = getReadableDatabase();
-//        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME,null);
-//        while (cursor.moveToNext()){
-////            ls.add(airTable.printData(cursor));
-//            break;
-//        }
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM item", null);
+//                "SELECT COUNT(`SiteName`) FROM item", null);
+//                "SELECT * FROM item WHERE SiteName = ?", new String[] {"二林"});
+        if (cursor.moveToNext()) {
+            ls.add(airTable.printData(cursor));
+        }
 
+        cursor.close();
         db.close();
         return ls;
     }

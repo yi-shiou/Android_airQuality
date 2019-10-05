@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private AirTable airTable;
 
     private ArrayList<String> items;
-    private BaseAdapter adapter;
+    private MyListAdapter adapter;
 
     private ProgressDialog dialog;
     @Override
@@ -56,10 +56,12 @@ public class MainActivity extends AppCompatActivity {
 
         //**** for database
         myDBHelper = new MyDBHelper(getApplicationContext());
-
+//
         items = new ArrayList<String>();
         adapter = new MyListAdapter(getApplicationContext(),items);
+        items.add("HIHI");
         listView.setAdapter(adapter);
+
 
         //--end dor database ****/
         switchOver();
@@ -71,31 +73,20 @@ public class MainActivity extends AppCompatActivity {
     //*********** for not MVP ****************
 
     //--- for air
-    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=1000&format=json";
+    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=3&format=json";
     Runnable runnable_air = new Runnable() {
         @Override
         public void run() {
             String output = "";
             try {
-
-//                Document doc = Jsoup.connect(airPATH).get();
-
-//                String InboxJson = "";
-//                InboxJson = Jsoup.connect(airPATH)
-//                    .timeout(1000000)
-//                    .header("Accept", "text/json")
-//                    .userAgent("Mozilla/5.0 (Windows NT 6.1; rv:40.0) Gecko/20100101 Firefox/40.0")
-//                    .get()
-//                    .body()
-//                    .text();
                 InputStream input = new URL(airPATH).openStream();
+
                 Reader reader = new InputStreamReader(input, "UTF-8");
                 int data = reader.read();
                 while (data != -1) {
                     output += (char)data;
                     data = reader.read();
                 }
-
 
                 if(output != "") {
 //                    output = doc.text();
@@ -156,24 +147,18 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private  void showAirData(String s){
-/*
+//*/
         String tmp = "1";
-        SQLiteDatabase db = myDBHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("_TITLE", "title");
-        values.put("_CONTENT", "content");
-        values.put("_KIND", "kind");
-        db.insert("MySample", null, values);
 
-        Cursor cursor = db.rawQuery(
-        "SELECT * FROM MySample", null);
-        while (cursor.moveToNext()){
-            tmp += cursor.getString(cursor.getColumnIndex("_TITLE"));
-        }
-*/
-        myDBHelper.addByJSON(s);
-        String tmp;
         tmp = myDBHelper.queryAll().get(0);
+//        items = new ArrayList<String>();
+//        adapter.addToList(tmp);
+//        listView.setAdapter(adapter);
+//
+//        items = new ArrayList<String>();
+//        items.add(tmp);
+//        adapter = new MyListAdapter(getApplicationContext(),items);
+//        listView.setAdapter(adapter);
 
         showDailyQuote(tmp);
         dialog.dismiss();

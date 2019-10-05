@@ -23,14 +23,15 @@ public class AirTable {
 
 //    private SQLiteDatabase db;
 
-    public AirTable(String TABLE_NAME,SQLiteDatabase db){
+    public AirTable(String TABLE_NAME){
 //        this.db = db;
 
         COLUMN_NUM = COLUMN_NAMES.length;
+//        CREATE_TABLE = "CREATE TABLE item (_id INTEGER PRIMARY KEY AUTOINCREMENT , `SiteName` TEXT , `County` TEXT , `AQI` TEXT , `Pollutant` TEXT , `Status` TEXT , `SO2` TEXT , `CO` TEXT , `CO_8hr` TEXT , `O3` TEXT , `O3_8hr` TEXT , `PM10` TEXT , `PM2.5` TEXT , `NO2` TEXT , `NOx` TEXT , `NO` TEXT , `WindSpeed` TEXT , `WindDirec` TEXT , `PublishTime` TEXT , `PM2.5_AVG` TEXT , `PM10_AVG` TEXT , `SO2_AVG` TEXT , `Longitude` TEXT , `Latitude` TEXT , `SiteId` TEXT)";
         CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT";
         for (String s: COLUMN_NAMES) {
-            CREATE_TABLE += "TEXT , " + s ;
+            CREATE_TABLE += " , `" + s + "` TEXT";
         }
         CREATE_TABLE += ")";
     }
@@ -38,7 +39,7 @@ public class AirTable {
     public String printData(Cursor cursor){
         String output = "";
         for (int i = 0; i < COLUMN_NUM; i++) {
-            output += "  " + cursor.getString(cursor.getColumnIndex(COLUMN_NAMES[i]));
+            output += "  " + cursor.getString(i);
         }
         return output;
     }
@@ -49,13 +50,14 @@ public class AirTable {
             JSONArray jsonArray = new JSONArray(json);
 
             for (int i = 0; i < jsonArray.length(); ++i){
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
 
                 List<String> ls = new ArrayList<String>();
                 for (String col_name : COLUMN_NAMES){
                     ls.add(jsonObject.getString(col_name));
                 }
                 addData(ls,db);
+//                ls.size();
             }
         } catch (JSONException e) {
         }
@@ -63,8 +65,9 @@ public class AirTable {
     }
     public void addData(List<String> ls,SQLiteDatabase db){
         ContentValues cv = new ContentValues();
-        for (int i = 0; i < ls.size(); ++i){
-            cv.put(COLUMN_NAMES[i], ls.get(i));
+        for (int i = 0; i < ls.size(); ++i)
+        {
+            cv.put("`"+COLUMN_NAMES[i]+"`", ls.get(i));
         }
         db.insert(TABLE_NAME, null, cv);
     }
