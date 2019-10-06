@@ -1,13 +1,8 @@
 package com.example.airquality.model;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,40 +31,24 @@ public class AirTable {
         CREATE_TABLE += ")";
     }
 
-    public String printData(Cursor cursor){
-        String output = "";
-        for (int i = 0; i < COLUMN_NUM; i++) {
-            output += "  " + cursor.getString(i);
-        }
-        return output;
-    }
+    public List<String> printData(Cursor cursor){
+        List<String> ls = new ArrayList<String>();
 
-
-    public void addByJSON(String json,SQLiteDatabase db){
-        try {
-            JSONArray jsonArray = new JSONArray(json);
-
-            for (int i = 0; i < jsonArray.length(); ++i){
-                JSONObject jsonObject = jsonArray.getJSONObject(0);
-
-                List<String> ls = new ArrayList<String>();
-                for (String col_name : COLUMN_NAMES){
-                    ls.add(jsonObject.getString(col_name));
-                }
-                addData(ls,db);
-//                ls.size();
+        while (cursor.moveToNext()) {
+            StringBuilder output = new StringBuilder();
+            for (int i = 0; i < COLUMN_NUM; i++) {
+                output.append("  ").append(cursor.getString(i));
             }
-        } catch (JSONException e) {
+            ls.add(output.toString());
         }
-
+        return ls;
     }
-    public void addData(List<String> ls,SQLiteDatabase db){
-        ContentValues cv = new ContentValues();
-        for (int i = 0; i < ls.size(); ++i)
+
+    public void addData(List<ContentValues> lcv,SQLiteDatabase db){
+        for (int i = 0; i < lcv.size(); ++i)
         {
-            cv.put("`"+COLUMN_NAMES[i]+"`", ls.get(i));
+            db.insert(TABLE_NAME, null, lcv.get(i));
         }
-        db.insert(TABLE_NAME, null, cv);
     }
 
     public boolean delete(int id,SQLiteDatabase db){

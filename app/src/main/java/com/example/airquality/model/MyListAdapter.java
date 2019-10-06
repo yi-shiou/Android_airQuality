@@ -10,12 +10,12 @@ import android.widget.TextView;
 
 import com.example.airquality.R;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MyListAdapter extends BaseAdapter {
     private LayoutInflater myInflater;
-    private List<String> list;
-    public MyListAdapter(Context context, List<String> list){
+    private ArrayList<String> list;
+    public MyListAdapter(Context context, ArrayList<String> list){
         myInflater = LayoutInflater.from(context);
         this.list = list;
     }
@@ -31,32 +31,59 @@ public class MyListAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return list.indexOf(getItem(position));
+//        return list.indexOf(getItem(position));
+        return position;
     }
 
-    private class ViewHolder{
+    static class ViewHolder{
         TextView value;
-        ImageView icon;
-        public ViewHolder(TextView value,ImageView icon){
+//        ImageView icon;
+//        public ViewHolder(TextView value,ImageView icon){
+//            this.value = value;
+//            this.icon = icon;
+//        }
+        public ViewHolder(TextView value){
             this.value = value;
-            this.icon = icon;
+//            this.icon = null;
+            value.setText("INIT");
         }
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        if (convertView==null){
+        //*/
+        ViewHolder holder;
+        if (convertView == null){
             convertView = myInflater.inflate(R.layout.list_item,null);
             holder = new ViewHolder(
-                    (TextView) convertView.findViewById(R.id.list_text),
-                    (ImageView) convertView.findViewById(R.id.list_img)
+                    (TextView) convertView.findViewById(R.id.list_text)
             );
+//            holder = new ViewHolder(
+//                    (TextView) convertView.findViewById(R.id.list_text),
+//                    (ImageView) convertView.findViewById(R.id.list_img)
+//            );
         }else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        holder.value.setText(list.get(position));
+        //*/
+        /*/
+        View item = myInflater.inflate(R.layout.list_item, null);
+        TextView textView = (TextView)item.findViewById(R.id.list_text);
+        textView.setText("HELLO");
+        return item;
+        //*/
+//        holder.value.setText(list.get(position));
+        holder.value.setText("HAAAAAAAAAAAAA");
+//        switch (position){
+////            case 0:
+////
+////                break;
+////            case 1:
+////                break;
+//            default:
+//                holder.icon= null;
+//                break;
+//        }
         return convertView;
     }
 

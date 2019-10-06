@@ -17,6 +17,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     private static MyDBHelper myDBHelper = null;
     public AirTable airTable = null;
     private Context context;
+    private JsonAnalysis jsonAnalysis;
 
 //    private static SQLiteDatabase database = null;
 
@@ -26,26 +27,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
         airTable = new AirTable(TABLE_NAME);
         this.context = context;
         this.getWritableDatabase().close();
+        jsonAnalysis = new JsonAnalysis();
     }
-
-//    public static SQLiteDatabase getDatabase(Context context) {
-//        if (database == null || !database.isOpen()) {
-//            database = this.getWritableDatabase();
-//        }
-//        return database;
-//    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(airTable.CREATE_TABLE);
-//		final String SQL = "CREATE TABLE IF NOT EXISTS " + "MySample" + "( " +
-//		                       "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-//				               "_TITLE VARCHAR(50), " +
-//		                       "_CONTENT TEXT," +
-//				               "_KIND VARCHAR(10)" +
-//				           ");";
-//        db.execSQL(SQL);
-
     }
 
     @Override
@@ -54,12 +41,29 @@ public class MyDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-//    public void close(){
-//        database.close();
-//    }
-    public void addByJSON(String json){
-        airTable.addByJSON(json,getWritableDatabase());
+    //--- check whether siteName exist in database
+    private boolean isExist(String siteName){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(`SiteName`) FROM item WHERE SiteName = ?", new String[] {siteName});
+        int result = 0;
+        if (cursor.moveToFirst())
+            result = cursor.getInt(0);
+        cursor.close();
+        db.close();
+        return result > 0;
     }
+    public void addByJSON(String json){
+//        isExist("二林");
+
+        if (isExist(jsonAnalysis.getFirstElement(json))){
+//
+        }else {
+            airTable.addData(jsonAnalysis.analyze(json), getWritableDatabase());
+        }
+//        return String.valueOf(airTable.addData(jsonAnalysis.analyze(json), getWritableDatabase()));
+    }
+
     public String queryItem(int id){
         String output = "get item ";
         SQLiteDatabase db = getReadableDatabase();
@@ -75,15 +79,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
         return output;
     }
     public List<String> queryAll(){
-        List<String> ls = new ArrayList<String>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 "SELECT * FROM item", null);
 //                "SELECT COUNT(`SiteName`) FROM item", null);
 //                "SELECT * FROM item WHERE SiteName = ?", new String[] {"二林"});
-        if (cursor.moveToNext()) {
-            ls.add(airTable.printData(cursor));
-        }
+        List<String> ls = airTable.printData(cursor);
 
         cursor.close();
         db.close();

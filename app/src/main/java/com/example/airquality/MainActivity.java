@@ -14,6 +14,9 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,6 +36,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private AirTable airTable;
 
     private ArrayList<String> items;
+    private ArrayAdapter<String> arrayAdapter;
     private MyListAdapter adapter;
 
     private ProgressDialog dialog;
@@ -58,9 +63,20 @@ public class MainActivity extends AppCompatActivity {
         myDBHelper = new MyDBHelper(getApplicationContext());
 //
         items = new ArrayList<String>();
-        adapter = new MyListAdapter(getApplicationContext(),items);
-        items.add("HIHI");
+//        adapter = new MyListAdapter(getApplicationContext(),items);
+//        listView.setAdapter(adapter);
+
+
+        arrayAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,items);
+        listView.setAdapter(arrayAdapter);
+//
+//
+//
+        items.add("TITEL");
         listView.setAdapter(adapter);
+
+
+//        listView.setAdapter(arrayAdapter);
 
 
         //--end dor database ****/
@@ -70,10 +86,13 @@ public class MainActivity extends AppCompatActivity {
         tv_dailyquote = (TextView) findViewById(R.id.tv_dailyquote);
         listView = (ListView) findViewById(R.id.listView);
     }
+    private void setAdapter(){
+
+    }
     //*********** for not MVP ****************
 
     //--- for air
-    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=3&format=json";
+    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=100&format=json";
     Runnable runnable_air = new Runnable() {
         @Override
         public void run() {
@@ -149,16 +168,12 @@ public class MainActivity extends AppCompatActivity {
     private  void showAirData(String s){
 //*/
         String tmp = "1";
+        myDBHelper.addByJSON(s);
+        List<String> ls =  myDBHelper.queryAll();
 
-        tmp = myDBHelper.queryAll().get(0);
-//        items = new ArrayList<String>();
-//        adapter.addToList(tmp);
-//        listView.setAdapter(adapter);
-//
-//        items = new ArrayList<String>();
-//        items.add(tmp);
-//        adapter = new MyListAdapter(getApplicationContext(),items);
-//        listView.setAdapter(adapter);
+//        tmp = "" + ls.size();
+        items.addAll(ls);
+        listView.setAdapter(arrayAdapter);
 
         showDailyQuote(tmp);
         dialog.dismiss();
