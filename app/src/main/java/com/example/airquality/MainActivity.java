@@ -1,202 +1,99 @@
 package com.example.airquality;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.airquality.model.AirTable;
-import com.example.airquality.model.HttpAsyncTask;
-import com.example.airquality.model.MyDBHelper;
-import com.example.airquality.model.MyListAdapter;
+public class MainActivity extends AppCompatActivity implements IView{
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
-
+    private  TextView tv_title;
     private TextView tv_dailyquote;
     private ListView listView;
-
-    //for database
-    private MyDBHelper myDBHelper;
-    private AirTable airTable;
-
-    private ArrayList<String> items;
-    private ArrayAdapter<String> arrayAdapter;
-    private MyListAdapter adapter;
+    private  Presenter mPresenter;
 
     private ProgressDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupViews();
 
-
-        //**** for database
-        myDBHelper = new MyDBHelper(getApplicationContext());
-//
-        items = new ArrayList<String>();
-//        adapter = new MyListAdapter(getApplicationContext(),items);
-//        listView.setAdapter(adapter);
-
-
-        arrayAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,items);
-        listView.setAdapter(arrayAdapter);
-//
-//
-//
-        items.add("TITEL");
-        listView.setAdapter(adapter);
-
-
-//        listView.setAdapter(arrayAdapter);
-
-
-        //--end dor database ****/
-        switchOver();
+        mPresenter = new Presenter(this,getApplicationContext());
+        mPresenter.onCreate();
     }
+
     private void setupViews() {
+        tv_title = (TextView) findViewById(R.id.tv_title);
         tv_dailyquote = (TextView) findViewById(R.id.tv_dailyquote);
         listView = (ListView) findViewById(R.id.listView);
-    }
-    private void setAdapter(){
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            float x, y, upx, upy;
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                final int action = event.getAction();
+                switch (action){
+                    case MotionEvent.ACTION_DOWN:
+                        x = event.getX();
+                        y = event.getY();
+                        break;
+//                    case MotionEvent.ACTION_MOVE:
+//                        float deltaX = event.getX() - x;
+//                        int position = ((ListView) view).pointToPosition((int) event.getX(), (int) event.getY());
+//                        ((ListView) view).getChildAt(position).scrollBy((int)deltaX, 0);
+//                        return true;//拖动的时候ListView不滚动
+//                        break;
+                    case MotionEvent.ACTION_UP:
+                        upx = event.getX();
+                        upy = event.getY();
+                        int position1 = ((ListView) view).pointToPosition((int) x, (int) y);
+                        int position2 = ((ListView) view).pointToPosition((int) upx,(int) upy);
 
-    }
-    //*********** for not MVP ****************
-
-    //--- for air
-    private String airPATH = "http://opendata.epa.gov.tw/webapi/Data/REWIQA/?$orderby=SiteName&$skip=0&$top=100&format=json";
-    Runnable runnable_air = new Runnable() {
-        @Override
-        public void run() {
-            String output = "";
-            try {
-                InputStream input = new URL(airPATH).openStream();
-
-                Reader reader = new InputStreamReader(input, "UTF-8");
-                int data = reader.read();
-                while (data != -1) {
-                    output += (char)data;
-                    data = reader.read();
+                        if (position1 == position2 && Math.abs(x - upx) > 10) {
+                            View v = ((ListView) view).getChildAt(position1);
+                            mPresenter.getArrayList().remove(position1);
+                            mPresenter.getArrayAdapter().notifyDataSetChanged();
+                        }
+                        break;
                 }
-
-                if(output != "") {
-//                    output = doc.text();
-//                    output = "done";
-                }else
-                    output = "Did not work!";
-
-            } catch (Exception e) {
-                output += "error";
+                return false;
             }
-
-            Message message = new Message();
-            message.obj = output;
-            message.what = 1;
-            handler.sendMessage(message);
-
-        }
-    };
-//    private
-
-
-
-
-    //--- for daily
-    private String path = "https://tw.appledaily.com/index/dailyquote/";
-
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            String output = "found nothing";
-            try
-            {
-                Document doc = Jsoup.connect(path).get();
-                Element dqTag = doc.selectFirst("article.dphs");
-                if (dqTag != null) {
-                    output = dqTag.text();
-                }
-            } catch (IOException e){
-            }
-            Message message = new Message();
-            message.obj = output;
-            message.what = 11;
-            handler.sendMessage(message);
-
-        }
-    };
-
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == 11) {
-                showDailyQuote((String)msg.obj);
-            }else {
-                showAirData((String)msg.obj);
-            }
-        }
-    };
-    private  void showAirData(String s){
-//*/
-        String tmp = "1";
-        myDBHelper.addByJSON(s);
-        List<String> ls =  myDBHelper.queryAll();
-
-//        tmp = "" + ls.size();
-        items.addAll(ls);
-        listView.setAdapter(arrayAdapter);
-
-        showDailyQuote(tmp);
-        dialog.dismiss();
+        });
     }
-    private void showDailyQuote(String s){
 
+    @Override
+    public void showDailyQuote(@NonNull String s){
         tv_dailyquote.setText(s);
         dialog.dismiss();
     }
 
-    public void switchOver() {
-        if (isNetworkAvailable(MainActivity.this)) {
-            // 显示“正在加载”窗口
+    @Override
+    public void setTextView(String s){
+        tv_dailyquote.setText(s);
+    }
+
+    // @Override function about dialog
+    @Override
+    public void showProgressDialog(){
             dialog = new ProgressDialog(this);
             dialog.setMessage("正在抓取数据...");
             dialog.setCancelable(false);
             dialog.show();
-
-//            new Thread(runnable).start();
-            new Thread(runnable_air).start();
-
-        } else {
-            // 弹出提示框
+    }
+    @Override
+    public void showAlertDialog(){
             new AlertDialog.Builder(this)
                     .setTitle("提示")
                     .setMessage("当前没有网络连接！")
@@ -211,6 +108,30 @@ public class MainActivity extends AppCompatActivity {
                     System.exit(0);  // 退出程序
                 }
             }).show();
+    }
+
+    @Override
+    public void dismissDialog(){
+        dialog.dismiss();
+    }
+    @Override
+    public void setLVAdapter(ArrayAdapter adapter){
+        listView.setAdapter(adapter);
+    }
+
+
+
+    @Override
+    public void switchOver() {
+        if (isNetworkAvailable(MainActivity.this)) {
+            showProgressDialog();
+
+//            new Thread(runnable).start();
+//            new Thread(runnable_air).start();
+
+        } else {
+            // 弹出提示框
+             showAlertDialog();
         }
     }
 
@@ -230,7 +151,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
-
-    //*********** for not MVP ****************/
 }

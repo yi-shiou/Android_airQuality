@@ -40,6 +40,9 @@ public class MyDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + airTable.TABLE_NAME);
         onCreate(db);
     }
+    public void getHeader(){
+//        airTable.
+    }
 
     //--- check whether siteName exist in database
     private boolean isExist(String siteName){
@@ -57,7 +60,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
 //        isExist("二林");
 
         if (isExist(jsonAnalysis.getFirstElement(json))){
-//
+            airTable.updteDate(jsonAnalysis.analyze(json), getWritableDatabase());
         }else {
             airTable.addData(jsonAnalysis.analyze(json), getWritableDatabase());
         }

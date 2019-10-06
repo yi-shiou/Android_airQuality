@@ -23,6 +23,7 @@ public class AirTable {
 
         COLUMN_NUM = COLUMN_NAMES.length;
 //        CREATE_TABLE = "CREATE TABLE item (_id INTEGER PRIMARY KEY AUTOINCREMENT , `SiteName` TEXT , `County` TEXT , `AQI` TEXT , `Pollutant` TEXT , `Status` TEXT , `SO2` TEXT , `CO` TEXT , `CO_8hr` TEXT , `O3` TEXT , `O3_8hr` TEXT , `PM10` TEXT , `PM2.5` TEXT , `NO2` TEXT , `NOx` TEXT , `NO` TEXT , `WindSpeed` TEXT , `WindDirec` TEXT , `PublishTime` TEXT , `PM2.5_AVG` TEXT , `PM10_AVG` TEXT , `SO2_AVG` TEXT , `Longitude` TEXT , `Latitude` TEXT , `SiteId` TEXT)";
+//        CREATE_TABLE = "CREATE TABLE item (`SiteName` TEXT PRIMARY KEY, `County` TEXT , `AQI` TEXT , `Pollutant` TEXT , `Status` TEXT , `SO2` TEXT , `CO` TEXT , `CO_8hr` TEXT , `O3` TEXT , `O3_8hr` TEXT , `PM10` TEXT , `PM2.5` TEXT , `NO2` TEXT , `NOx` TEXT , `NO` TEXT , `WindSpeed` TEXT , `WindDirec` TEXT , `PublishTime` TEXT , `PM2.5_AVG` TEXT , `PM10_AVG` TEXT , `SO2_AVG` TEXT , `Longitude` TEXT , `Latitude` TEXT , `SiteId` TEXT)";
         CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
         KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT";
         for (String s: COLUMN_NAMES) {
@@ -49,6 +50,16 @@ public class AirTable {
         {
             db.insert(TABLE_NAME, null, lcv.get(i));
         }
+    }
+    public void updteDate(List<ContentValues> lcv,SQLiteDatabase db){
+        for (int i = 0; i < lcv.size(); ++i)
+        {
+            db.update(TABLE_NAME, lcv.get(i),"`SiteName` = "+lcv.get(i).getAsString("SiteName"),null);
+//            db.replace(TABLE_NAME,null,lcv.get(i));
+        }
+    }
+    public String gatHeader(){
+        return "Titel";
     }
 
     public boolean delete(int id,SQLiteDatabase db){
