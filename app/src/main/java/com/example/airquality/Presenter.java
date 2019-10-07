@@ -8,26 +8,18 @@ import android.widget.ArrayAdapter;
 import com.example.airquality.model.DBModel;
 import com.example.airquality.model.GettingWebData;
 import com.example.airquality.model.IDBModel;
-import com.example.airquality.model.MyDBHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Presenter implements IPresenter{
     private IView iView;
     private IDBModel idbModel;
-
-    private MyDBHelper myDBHelper;
-
-    private ArrayList<String> arrayList;
-    private ArrayAdapter<String> arrayAdapter;
 
     private static Handler handler;
 
     public Presenter(IView view, Context context){
         iView = view;
         initDatabase(context);
-        idbModel = new DBModel(context);
 
         handler = new Handler() {
             @Override
@@ -68,19 +60,16 @@ public class Presenter implements IPresenter{
     };
     //--- for database
     private void initDatabase(Context context){
-        myDBHelper = new MyDBHelper(context);
+        idbModel = new DBModel(context);
+        iView.setLVAdapter(idbModel.getArrayAdapter());
 
-        arrayList = new ArrayList<String>();
-        arrayAdapter = new ArrayAdapter<>(context,android.R.layout.simple_list_item_1,arrayList);
-        iView.setLVAdapter(arrayAdapter);
-
-        iView.setTitle(myDBHelper.getTitle());
+        iView.setTitle(idbModel.getTitle());
     }
     public ArrayList<String> getArrayList(){
-        return arrayList;
+        return idbModel.getArrayList();
     }
     public ArrayAdapter<String> getArrayAdapter(){
-        return arrayAdapter;
+        return idbModel.getArrayAdapter();
     }
 
     //--- for Air Info
@@ -88,15 +77,12 @@ public class Presenter implements IPresenter{
         new Thread(runnable_air).start();
     }
     private  void updateAirInfo(String s){
-        myDBHelper.addByJSON(s);
+        idbModel.addByJSON(s);
         iView.dismissDialog();
         showAirInfo();
     }
     private void showAirInfo(){
-        List<String> ls =  myDBHelper.queryAll();
-        arrayList.clear();
-        arrayList.addAll(ls);
-        iView.setLVAdapter(arrayAdapter);
+        iView.setLVAdapter(idbModel.showAirInfo());
     }
 
     //--- for daily quote

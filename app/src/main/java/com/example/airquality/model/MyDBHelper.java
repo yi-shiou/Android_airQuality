@@ -13,18 +13,13 @@ public class MyDBHelper extends SQLiteOpenHelper{
     public static final String TABLE_NAME = "item";
     public static final int VERSION = 1;
 
-    private static MyDBHelper myDBHelper = null;
-    public AirTable airTable = null;
-    private Context context;
+    public AirTable airTable;
     private JsonAnalysis jsonAnalysis;
-
-//    private static SQLiteDatabase database = null;
 
     public MyDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
 
         airTable = new AirTable(TABLE_NAME);
-        this.context = context;
         this.getWritableDatabase().close();
         jsonAnalysis = new JsonAnalysis();
     }
@@ -40,13 +35,8 @@ public class MyDBHelper extends SQLiteOpenHelper{
         onCreate(db);
     }
     public String getTitle(){
-        String tital = "測站名稱  縣市  空氣品質指標  空氣污染指標物  狀態  二氧化硫(ppb)  一氧化碳(ppm)  " +
-                "一氧化碳8小時平均  臭氧(ppb)  臭氧8小時平均  懸浮微粒(μg/m3)        一氧化氮(ppb)  " +
-                "風速(m/sec)  風向(degrees)  資料建置日期  細懸浮微粒移動平均  懸浮微粒移動平均值  二氧化硫移動平均值  經度  緯度  測站編號";
-
         return airTable.getTitle();
     }
-
     //--- check whether siteName exist in database
     private boolean isExist(String siteName){
         SQLiteDatabase db = getReadableDatabase();
