@@ -44,6 +44,13 @@ public class AirTable {
         }
         return ls;
     }
+    public String getTitle(){
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < COLUMN_NUM; i++) {
+            output.append("  ").append(COLUMN_NAMES[i]);
+        }
+        return output.toString();
+    }
 
     public void addData(List<ContentValues> lcv,SQLiteDatabase db){
         for (int i = 0; i < lcv.size(); ++i)
@@ -58,10 +65,6 @@ public class AirTable {
 //            db.replace(TABLE_NAME,null,lcv.get(i));
         }
     }
-    public String gatHeader(){
-        return "Titel";
-    }
-
     public boolean delete(int id,SQLiteDatabase db){
         String where = KEY_ID + "=" + id;
         return db.delete(TABLE_NAME,where,null) > 0 ;

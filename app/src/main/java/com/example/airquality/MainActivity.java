@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements IView{
 
     private  TextView tv_title;
     private TextView tv_dailyquote;
+    private Button bt_refresh;
     private ListView listView;
     private  Presenter mPresenter;
 
@@ -39,6 +41,14 @@ public class MainActivity extends AppCompatActivity implements IView{
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_dailyquote = (TextView) findViewById(R.id.tv_dailyquote);
         listView = (ListView) findViewById(R.id.listView);
+        bt_refresh = (Button) findViewById(R.id.bt_refresh);
+        bt_refresh.setText("刷新");
+        bt_refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.refreshData();
+            }
+        });
         listView.setOnTouchListener(new View.OnTouchListener() {
             float x, y, upx, upy;
             @Override
@@ -76,12 +86,11 @@ public class MainActivity extends AppCompatActivity implements IView{
     @Override
     public void showDailyQuote(@NonNull String s){
         tv_dailyquote.setText(s);
-        dialog.dismiss();
     }
 
     @Override
-    public void setTextView(String s){
-        tv_dailyquote.setText(s);
+    public void setTitle(String s){
+        tv_title.setText(s);
     }
 
     // @Override function about dialog

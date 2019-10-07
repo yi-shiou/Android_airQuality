@@ -68,7 +68,7 @@ public class Presenter implements IPresenter{
         arrayAdapter = new ArrayAdapter<>(context,android.R.layout.simple_list_item_1,arrayList);
         iView.setLVAdapter(arrayAdapter);
 
-
+        iView.setTitle(myDBHelper.getTitle());
     }
     ArrayList<String> getArrayList(){
         return arrayList;
@@ -83,11 +83,14 @@ public class Presenter implements IPresenter{
     }
     private  void updateAirInfo(String s){
         myDBHelper.addByJSON(s);
+        iView.dismissDialog();
+        showAirInfo();
+    }
+    private void showAirInfo(){
         List<String> ls =  myDBHelper.queryAll();
+        arrayList.clear();
         arrayList.addAll(ls);
         iView.setLVAdapter(arrayAdapter);
-
-        iView.dismissDialog();
     }
 
     //--- for daily quote
@@ -95,14 +98,18 @@ public class Presenter implements IPresenter{
         new Thread(runnable).start();
     }
     private void updateDailyQuote(String s){
-        iView.setTextView(s);
+        iView.showDailyQuote(s);
     }
 
 
-    public void onCreate() {
-        iView.switchOver();
+    public void refreshData(){
+        iView.switchOver();     //-- show ProgressDialog from refreshData to updateAirInfo
         loadAirInfo();
         loadDailyQuote();
+    }
+    public void onCreate() {
+        showAirInfo();
+        refreshData();
     }
     public void onPause() { }
     public void onResume() { }

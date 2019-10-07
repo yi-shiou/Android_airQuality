@@ -5,7 +5,7 @@ import android.widget.ArrayAdapter;
 public interface IView {
 
     void showDailyQuote(String s);
-    void setTextView(String s);
+    void setTitle(String s);
 
     // function about dialog
     void showProgressDialog();
