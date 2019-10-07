@@ -5,7 +5,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.ArrayAdapter;
 
+import com.example.airquality.model.DBModel;
 import com.example.airquality.model.GettingWebData;
+import com.example.airquality.model.IDBModel;
 import com.example.airquality.model.MyDBHelper;
 
 import java.util.ArrayList;
@@ -13,7 +15,10 @@ import java.util.List;
 
 public class Presenter implements IPresenter{
     private IView iView;
+    private IDBModel idbModel;
+
     private MyDBHelper myDBHelper;
+
     private ArrayList<String> arrayList;
     private ArrayAdapter<String> arrayAdapter;
 
@@ -22,6 +27,7 @@ public class Presenter implements IPresenter{
     public Presenter(IView view, Context context){
         iView = view;
         initDatabase(context);
+        idbModel = new DBModel(context);
 
         handler = new Handler() {
             @Override
@@ -70,10 +76,10 @@ public class Presenter implements IPresenter{
 
         iView.setTitle(myDBHelper.getTitle());
     }
-    ArrayList<String> getArrayList(){
+    public ArrayList<String> getArrayList(){
         return arrayList;
     }
-    ArrayAdapter<String> getArrayAdapter(){
+    public ArrayAdapter<String> getArrayAdapter(){
         return arrayAdapter;
     }
 

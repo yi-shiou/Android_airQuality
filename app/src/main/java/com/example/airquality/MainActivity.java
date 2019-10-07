@@ -21,9 +21,8 @@ public class MainActivity extends AppCompatActivity implements IView{
 
     private  TextView tv_title;
     private TextView tv_dailyquote;
-    private Button bt_refresh;
     private ListView listView;
-    private  Presenter mPresenter;
+    private  IPresenter iPresenter;
 
     private ProgressDialog dialog;
 
@@ -33,20 +32,20 @@ public class MainActivity extends AppCompatActivity implements IView{
         setContentView(R.layout.activity_main);
         setupViews();
 
-        mPresenter = new Presenter(this,getApplicationContext());
-        mPresenter.onCreate();
+        iPresenter = new Presenter(this,getApplicationContext());
+        iPresenter.onCreate();
     }
 
     private void setupViews() {
         tv_title = (TextView) findViewById(R.id.tv_title);
         tv_dailyquote = (TextView) findViewById(R.id.tv_dailyquote);
         listView = (ListView) findViewById(R.id.listView);
-        bt_refresh = (Button) findViewById(R.id.bt_refresh);
+        Button bt_refresh = (Button) findViewById(R.id.bt_refresh);
         bt_refresh.setText("刷新");
         bt_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.refreshData();
+                iPresenter.refreshData();
             }
         });
         listView.setOnTouchListener(new View.OnTouchListener() {
@@ -73,8 +72,8 @@ public class MainActivity extends AppCompatActivity implements IView{
 
                         if (position1 == position2 && Math.abs(x - upx) > 10) {
                             View v = ((ListView) view).getChildAt(position1);
-                            mPresenter.getArrayList().remove(position1);
-                            mPresenter.getArrayAdapter().notifyDataSetChanged();
+                            iPresenter.getArrayList().remove(position1);
+                            iPresenter.getArrayAdapter().notifyDataSetChanged();
                         }
                         break;
                 }

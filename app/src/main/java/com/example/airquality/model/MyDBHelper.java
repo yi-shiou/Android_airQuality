@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.List;
 
-public class MyDBHelper extends SQLiteOpenHelper {
+public class MyDBHelper extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME = "airQuality.db";
     public static final String TABLE_NAME = "item";
