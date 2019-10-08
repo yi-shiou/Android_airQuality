@@ -72,8 +72,7 @@ public class MainActivity extends AppCompatActivity implements IView{
 
                         if (position1 == position2 && Math.abs(x - upx) > 10) {
                             View v = ((ListView) view).getChildAt(position1);
-                            iPresenter.getArrayList().remove(position1);
-                            iPresenter.getArrayAdapter().notifyDataSetChanged();
+                            iPresenter.deleteListViewElement(position1);
                         }
                         break;
                 }

@@ -19,12 +19,12 @@ public class DBModel implements IDBModel {
     public DBModel(Context context){
         myDBHelper = new MyDBHelper(context);
 
-        arrayList = new ArrayList<String>();
+        arrayList = new ArrayList<>();
         arrayAdapter = new ArrayAdapter<>(context,android.R.layout.simple_list_item_1,arrayList);
     }
+
     @NonNull
-    @Override
-    public ArrayList<String> getArrayList(){
+    private ArrayList<String> getArrayList(){
         return arrayList;
     }
     @NonNull
@@ -33,10 +33,11 @@ public class DBModel implements IDBModel {
         return arrayAdapter;
     }
 
-
+    @Override
     public void addByJSON(String json){
         myDBHelper.addByJSON(json);
     }
+
     @NonNull
     @Override
     public ArrayAdapter<String> showAirInfo(){
@@ -45,6 +46,13 @@ public class DBModel implements IDBModel {
         arrayList.addAll(ls);
         return getArrayAdapter();
     }
+
+    @Override
+    public void deleteListViewElement(int position){
+        getArrayList().remove(position);
+        getArrayAdapter().notifyDataSetChanged();
+    }
+
     @Override
     public String getTitle() {
         return myDBHelper.getTitle();
