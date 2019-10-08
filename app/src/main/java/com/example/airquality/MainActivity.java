@@ -58,12 +58,6 @@ public class MainActivity extends AppCompatActivity implements IView{
                         x = event.getX();
                         y = event.getY();
                         break;
-//                    case MotionEvent.ACTION_MOVE:
-//                        float deltaX = event.getX() - x;
-//                        int position = ((ListView) view).pointToPosition((int) event.getX(), (int) event.getY());
-//                        ((ListView) view).getChildAt(position).scrollBy((int)deltaX, 0);
-//                        return true;//拖动的时候ListView不滚动
-//                        break;
                     case MotionEvent.ACTION_UP:
                         upx = event.getX();
                         upy = event.getY();
@@ -132,10 +126,6 @@ public class MainActivity extends AppCompatActivity implements IView{
     public void switchOver() {
         if (isNetworkAvailable(MainActivity.this)) {
             showProgressDialog();
-
-//            new Thread(runnable).start();
-//            new Thread(runnable_air).start();
-
         } else {
             // 弹出提示框
              showAlertDialog();
