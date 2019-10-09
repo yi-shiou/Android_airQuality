@@ -1,12 +1,10 @@
 package com.example.airquality.model;
 
-import android.widget.ArrayAdapter;
-
 public interface IDBModel {
-    ArrayAdapter<String> getArrayAdapter();
+    MyListAdapter getArrayAdapter();
 
     void addByJSON(String json);
-    ArrayAdapter<String> showAirInfo();
+    MyListAdapter showAirInfo();
     void deleteListViewElement(int position);
     String getTitle();
 }

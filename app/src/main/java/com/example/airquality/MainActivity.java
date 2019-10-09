@@ -12,10 +12,11 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.airquality.model.MyListAdapter;
 
 public class MainActivity extends AppCompatActivity implements IView{
 
@@ -116,11 +117,9 @@ public class MainActivity extends AppCompatActivity implements IView{
         dialog.dismiss();
     }
     @Override
-    public void setLVAdapter(ArrayAdapter adapter){
+    public void setLVAdapter(MyListAdapter adapter){
         listView.setAdapter(adapter);
     }
-
-
 
     @Override
     public void switchOver() {

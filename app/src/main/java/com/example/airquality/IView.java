@@ -1,6 +1,6 @@
 package com.example.airquality;
 
-import android.widget.ArrayAdapter;
+import com.example.airquality.model.MyListAdapter;
 
 public interface IView {
 
@@ -14,5 +14,5 @@ public interface IView {
     void switchOver();//show the loading dialog
 
     // for database
-    void setLVAdapter(ArrayAdapter adapter);
+    void setLVAdapter(MyListAdapter adapter);
 }

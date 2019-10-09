@@ -1,7 +1,6 @@
 package com.example.airquality.model;
 
 import android.content.Context;
-import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
@@ -13,24 +12,24 @@ public class DBModel implements IDBModel {
     @NonNull
     private final MyDBHelper myDBHelper;
 
-    private ArrayList<String> arrayList;
-    private ArrayAdapter<String> arrayAdapter;
+    private ArrayList<AirInfo> airInfos;
+    private MyListAdapter adapter;
 
     public DBModel(Context context){
         myDBHelper = new MyDBHelper(context);
 
-        arrayList = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(context,android.R.layout.simple_list_item_1,arrayList);
+        airInfos = new ArrayList<>();
+        adapter = new MyListAdapter(context,airInfos);
     }
 
     @NonNull
-    private ArrayList<String> getArrayList(){
-        return arrayList;
+    private ArrayList<AirInfo> getArrayList(){
+        return airInfos;
     }
     @NonNull
     @Override
-    public ArrayAdapter<String> getArrayAdapter(){
-        return arrayAdapter;
+    public MyListAdapter getArrayAdapter(){
+        return adapter;
     }
 
     @Override
@@ -40,10 +39,12 @@ public class DBModel implements IDBModel {
 
     @NonNull
     @Override
-    public ArrayAdapter<String> showAirInfo(){
+    public MyListAdapter showAirInfo(){
         List<String> ls =  myDBHelper.queryAll();
-        arrayList.clear();
-        arrayList.addAll(ls);
+        airInfos.clear();
+        for (String s:ls) {
+            airInfos.add(new AirInfo(s));
+        }
         return getArrayAdapter();
     }
 
